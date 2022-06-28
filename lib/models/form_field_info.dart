@@ -1,6 +1,8 @@
 class FormFieldInfo {
   final String label;
   final String hint;
+  bool isPassword;
 
-  FormFieldInfo(this.label, this.hint);
+  FormFieldInfo(
+      {required this.label, required this.hint, this.isPassword = false});
 }

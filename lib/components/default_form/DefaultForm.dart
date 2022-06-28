@@ -3,15 +3,16 @@ import 'package:passwords_client/models/form_field_info.dart';
 
 class DefaultForm extends StatefulWidget {
   final List<FormFieldInfo> formFieldInfos;
-  const DefaultForm({Key? key, required this.formFieldInfos}) : super(key: key);
+  final GlobalKey<FormState> formKey;
+  const DefaultForm(
+      {Key? key, required this.formFieldInfos, required this.formKey})
+      : super(key: key);
 
   @override
   State<DefaultForm> createState() => _DefaultFormState();
 }
 
 class _DefaultFormState extends State<DefaultForm> {
-  final _formKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     final List forms = [];
@@ -22,26 +23,19 @@ class _DefaultFormState extends State<DefaultForm> {
           if (value == null || value.isEmpty) {
             return 'Please enter some text';
           }
+          if (value.length < 6) return 'At least 6 characters';
           return null;
         },
+        decoration: InputDecoration(hintText: formField.hint),
+        obscureText: formField.isPassword,
       ));
     }
 
     return Form(
-      key: _formKey,
+      key: widget.formKey,
       child: Column(
         children: [
           ...forms,
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Processing Data')),
-                );
-              }
-            },
-            child: const Text('Submit'),
-          ),
         ],
       ),
     );
