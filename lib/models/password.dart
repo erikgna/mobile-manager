@@ -1,10 +1,25 @@
 class Password {
-  final int id;
+  final int? id;
   final String? contentName;
   final String? password;
-  final int categoryID;
-  final int userID;
+  final int? categoryID;
+  final int? userID;
 
   Password(
-      this.id, this.contentName, this.password, this.categoryID, this.userID);
+      {this.id, this.contentName, this.password, this.categoryID, this.userID});
+
+  Password.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        contentName = json['contentName'],
+        password = json['password'],
+        categoryID = json['categoryID'],
+        userID = json['userID'];
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'contentName': contentName,
+        'password': password,
+        'categoryID': categoryID,
+        'userID': userID,
+      };
 }

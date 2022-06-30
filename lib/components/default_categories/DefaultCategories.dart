@@ -17,7 +17,7 @@ class _DefaultCategoriesState extends State<DefaultCategories> {
     final List listedCategories = [];
 
     for (Category category in widget.categories) {
-      TextButton(child: Text(category.categoryName), onPressed: () {});
+      TextButton(child: Text(category.categoryName!), onPressed: () {});
     }
 
     return ListView(

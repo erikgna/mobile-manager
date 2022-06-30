@@ -19,6 +19,7 @@ class _DefaultFormState extends State<DefaultForm> {
 
     for (FormFieldInfo formField in widget.formFieldInfos) {
       forms.add(TextFormField(
+        controller: formField.textController,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter some text';

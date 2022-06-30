@@ -14,6 +14,11 @@ class Auth extends StatefulWidget {
 
 class _AuthState extends State<Auth> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+  final TextEditingController confirmPassController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  // final TextEditingController emailController = TextEditingController();
   bool isLogin = true;
 
   @override
@@ -28,29 +33,48 @@ class _AuthState extends State<Auth> {
         Text('Password Manager'),
         isLogin
             ? DefaultForm(formKey: _formKey, formFieldInfos: [
-                FormFieldInfo(hint: 'Email', label: 'Email'),
                 FormFieldInfo(
-                    hint: 'Password', label: 'Password', isPassword: true)
+                    hint: 'Email',
+                    label: 'Email',
+                    textController: emailController),
+                FormFieldInfo(
+                    hint: 'Password',
+                    label: 'Password',
+                    isPassword: true,
+                    textController: passController)
               ])
             : DefaultForm(formKey: _formKey, formFieldInfos: [
-                FormFieldInfo(hint: 'Full name', label: 'Full name'),
-                FormFieldInfo(hint: 'Email', label: 'Email'),
                 FormFieldInfo(
-                    hint: 'Password', label: 'Password', isPassword: true),
+                    hint: 'Full name',
+                    label: 'Full name',
+                    textController: nameController),
+                FormFieldInfo(
+                    hint: 'Email',
+                    label: 'Email',
+                    textController: emailController),
+                FormFieldInfo(
+                    hint: 'Password',
+                    label: 'Password',
+                    isPassword: true,
+                    textController: passController),
                 FormFieldInfo(
                     hint: 'Confirm password',
                     label: 'Confirm password',
-                    isPassword: true),
+                    isPassword: true,
+                    textController: confirmPassController),
               ]),
         ElevatedButton(
           onPressed: () async {
             if (_formKey.currentState!.validate()) {}
+            bool success = false;
 
-            await userController.saveUser();
+            isLogin
+                ? success = await userController.getUser()
+                : success = await userController.saveUser();
 
-            Navigator.of(context).pop();
+            if (success) Navigator.of(context).pop();
           },
-          child: const Text('Submit'),
+          child: Text(isLogin ? 'Login' : 'Register'),
         ),
         RichText(
             textAlign: TextAlign.center,
