@@ -14,13 +14,14 @@ class PasswordWebClient {
     final String? userFromStorage = await storage.read(key: 'user');
     final user = jsonDecode(userFromStorage!);
 
-    final Response response = await client
-        .get(Uri.parse('http://10.0.2.2:3000/api/v1/password/$id'), headers: {
-      'Content-type': 'application/json',
-      'Accept': '*/*',
-      'refreshToken': user['refreshToken'],
-      'authorization': 'Bearer ${user['accessToken']}'
-    });
+    final Response response = await client.get(
+        Uri.parse('http://192.168.3.6:3000/api/v1/password/$id'),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': '*/*',
+          'refreshToken': user['refreshToken'],
+          'authorization': 'Bearer ${user['accessToken']}'
+        });
 
     if (response.statusCode == 200) {
       return Password.fromJson(jsonDecode(response.body));
@@ -34,7 +35,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client
-        .get(Uri.parse('http://10.0.2.2:3000/api/v1/password'), headers: {
+        .get(Uri.parse('http://192.168.3.6:3000/api/v1/password'), headers: {
       'Content-type': 'application/json',
       'Accept': '*/*',
       'refreshToken': user['refreshToken'],
@@ -59,7 +60,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response =
-        await client.post(Uri.parse('http://10.0.2.2:3000/api/v1/password'),
+        await client.post(Uri.parse('http://192.168.3.6:3000/api/v1/password'),
             headers: {
               'Content-type': 'application/json',
               'Accept': '*/*',
@@ -80,7 +81,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.put(
-        Uri.parse('http://10.0.2.2:3000/api/v1/password/${password.id}'),
+        Uri.parse('http://192.168.3.6:3000/api/v1/password/${password.id}'),
         headers: {
           'Content-type': 'application/json',
           'Accept': '*/*',
@@ -101,7 +102,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.delete(
-      Uri.parse('http://10.0.2.2:3000/api/v1/password/$id'),
+      Uri.parse('http://192.168.3.6:3000/api/v1/password/$id'),
       headers: {
         'Content-type': 'application/json',
         'Accept': '*/*',

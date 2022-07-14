@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passwords_client/components/default_form/DefaultForm.dart';
 import 'package:passwords_client/models/form_field_info.dart';
+import 'package:passwords_client/models/user.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/user_provider.dart';
@@ -68,9 +69,16 @@ class _AuthState extends State<Auth> {
             if (_formKey.currentState!.validate()) {}
             bool success = false;
 
+            final User user = User(
+              email: emailController.text,
+              userName: nameController.text,
+              password: passController.text,
+              confirmPassword: confirmPassController.text,
+            );
+
             isLogin
-                ? success = await userController.getUser()
-                : success = await userController.saveUser();
+                ? success = await userController.getUser(userInput: user)
+                : success = await userController.saveUser(user);
 
             if (success) Navigator.of(context).pop();
           },

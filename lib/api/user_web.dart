@@ -8,13 +8,14 @@ import 'package:passwords_client/models/user.dart';
 import 'config/webclient.dart';
 
 class UserWebClient {
-  Future<dynamic> login(User user) async {
+  Future<Token> login(User user) async {
+    print(user.toJson());
     final Response response = await client.post(
-      Uri.parse('http://10.0.2.2:3000/api/v1/user/login'),
+      Uri.parse('http://192.168.3.6:3000/api/v1/user/login'),
       headers: {'Content-type': 'application/json', 'Accept': '*/*'},
       body: jsonEncode(user.toJson()),
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       return Token.fromJson(jsonDecode(response.body));
     }
@@ -23,11 +24,13 @@ class UserWebClient {
   }
 
   Future<Token> register(User user) async {
+    print(user.toJson());
     final Response response = await client.post(
-        Uri.parse('http://10.0.2.2:3000/api/v1/user/create'),
+        Uri.parse('http://192.168.3.6:3000/api/v1/user/create'),
         headers: {'Content-type': 'application/json', 'Accept': '*/*'},
         body: jsonEncode(user.toJson()));
 
+    print(response.body);
     if (response.statusCode == 201) {
       return Token.fromJson(jsonDecode(response.body));
     }
@@ -36,15 +39,15 @@ class UserWebClient {
   }
 
   Future<void> deleteUser(User user) async {
-    final Response response =
-        await client.post(Uri.parse('http://10.0.2.2:3000/api/v1/user/delete'),
-            headers: {
-              'Content-type': 'application/json',
-              'Accept': '*/*',
-              'refreshToken': user.refreshToken!,
-              'authorization': 'Bearer ${user.accessToken!}'
-            },
-            body: jsonEncode(user.toJson()));
+    final Response response = await client.post(
+        Uri.parse('http://192.168.3.6:3000/api/v1/user/delete'),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': '*/*',
+          'refreshToken': user.refreshToken!,
+          'authorization': 'Bearer ${user.accessToken!}'
+        },
+        body: jsonEncode(user.toJson()));
 
     if (response.statusCode == 200) return;
 

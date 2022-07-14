@@ -17,6 +17,8 @@ class CreateCategory extends StatefulWidget {
 class _CreateCategoryState extends State<CreateCategory> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController textController = TextEditingController();
+  bool isEdit = false;
+  int categoryID = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,15 @@ class _CreateCategoryState extends State<CreateCategory> {
       categoriesWidget.add(ListTile(
           title: Text(category.categoryName!),
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            IconButton(icon: Icon(Icons.edit), onPressed: () {}),
+            IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  setState(() {
+                    isEdit = true;
+                    categoryID = category.id!;
+                    textController.text = category.categoryName!;
+                  });
+                }),
             IconButton(
                 icon: Icon(Icons.delete_outline_outlined),
                 onPressed: () async {
@@ -64,6 +74,22 @@ class _CreateCategoryState extends State<CreateCategory> {
           },
           child: const Text('Submit'),
         ),
+        isEdit
+            ? ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {}
+
+                  categoryController.updateCategory(Category(
+                      id: categoryID, categoryName: textController.text));
+
+                  setState(() {
+                    categoryID = 0;
+                    isEdit = false;
+                  });
+                },
+                child: const Text('Send Edition'),
+              )
+            : SizedBox.shrink(),
         ...categoriesWidget
       ]),
     );

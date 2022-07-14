@@ -23,15 +23,8 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> saveUser() async {
+  Future<bool> saveUser(User userInput) async {
     try {
-      final User userInput = User(
-        email: 'teste2@email.com',
-        userName: 'Teste',
-        password: 'A234567@',
-        confirmPassword: 'A234567@',
-      );
-
       final Token token = await _userWeb.register(userInput);
 
       final decodedToken = JwtDecoder.decode(token.accessToken);
@@ -53,14 +46,9 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> getUser() async {
+  Future<bool> getUser({User? userInput}) async {
     try {
-      final User userInput = User(
-        email: 'teste2@email.com',
-        password: 'A234567@',
-      );
-
-      final Token token = await _userWeb.login(userInput);
+      final Token token = await _userWeb.login(userInput!);
 
       final decodedToken = JwtDecoder.decode(token.accessToken);
 

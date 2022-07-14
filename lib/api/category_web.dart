@@ -14,13 +14,14 @@ class CategoryWebClient {
     final String? userFromStorage = await storage.read(key: 'user');
     final user = jsonDecode(userFromStorage!);
 
-    final Response response = await client
-        .get(Uri.parse('http://10.0.2.2:3000/api/v1/category/$id'), headers: {
-      'Content-type': 'application/json',
-      'Accept': '*/*',
-      'refreshToken': user['refreshToken'],
-      'authorization': 'Bearer ${user['accessToken']}'
-    });
+    final Response response = await client.get(
+        Uri.parse('http://192.168.3.6:3000/api/v1/category/$id'),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': '*/*',
+          'refreshToken': user['refreshToken'],
+          'authorization': 'Bearer ${user['accessToken']}'
+        });
 
     if (response.statusCode == 200) {
       return Category.fromJson(jsonDecode(response.body));
@@ -34,7 +35,7 @@ class CategoryWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client
-        .get(Uri.parse('http://10.0.2.2:3000/api/v1/category'), headers: {
+        .get(Uri.parse('http://192.168.3.6:3000/api/v1/category'), headers: {
       'Content-type': 'application/json',
       'Accept': '*/*',
       'refreshToken': user['refreshToken'],
@@ -59,7 +60,7 @@ class CategoryWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response =
-        await client.post(Uri.parse('http://10.0.2.2:3000/api/v1/category'),
+        await client.post(Uri.parse('http://192.168.3.6:3000/api/v1/category'),
             headers: {
               'Content-type': 'application/json',
               'Accept': '*/*',
@@ -80,14 +81,14 @@ class CategoryWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.put(
-        Uri.parse('http://10.0.2.2:3000/api/v1/category/${category.id}'),
+        Uri.parse('http://192.168.3.6:3000/api/v1/category/${category.id}'),
         headers: {
           'Content-type': 'application/json',
           'Accept': '*/*',
           'refreshToken': user['refreshToken'],
           'authorization': 'Bearer ${user['accessToken']}'
         },
-        body: category.toJson());
+        body: jsonEncode(category.toJson()));
 
     if (response.statusCode == 200) {
       return Category.fromJson(jsonDecode(response.body));
@@ -101,7 +102,7 @@ class CategoryWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.delete(
-      Uri.parse('http://10.0.2.2:3000/api/v1/category/$id'),
+      Uri.parse('http://192.168.3.6:3000/api/v1/category/$id'),
       headers: {
         'Content-type': 'application/json',
         'Accept': '*/*',
