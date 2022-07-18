@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:passwords_client/models/form_field_info.dart';
 
+import '../../core/theme/form_field_theme.dart';
+
 class DefaultForm extends StatefulWidget {
   final List<FormFieldInfo> formFieldInfos;
   final GlobalKey<FormState> formKey;
@@ -27,7 +29,11 @@ class _DefaultFormState extends State<DefaultForm> {
           if (value.length < 6) return 'At least 6 characters';
           return null;
         },
-        decoration: InputDecoration(hintText: formField.hint),
+        decoration: getTextFieldDecoration(
+            context: context,
+            enabled: true,
+            label: formField.label,
+            isInvalid: false),
         obscureText: formField.isPassword,
       ));
     }

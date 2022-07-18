@@ -5,29 +5,28 @@ import 'package:passwords_client/models/password.dart';
 import 'package:passwords_client/providers/password_provider.dart';
 import 'package:provider/provider.dart';
 
-class CreatePassword extends StatefulWidget {
-  const CreatePassword({Key? key}) : super(key: key);
+class ListCategories extends StatefulWidget {
+  const ListCategories({Key? key}) : super(key: key);
 
   @override
-  State<CreatePassword> createState() => _CreatePasswordState();
+  State<ListCategories> createState() => _ListCategoriesState();
 }
 
-class _CreatePasswordState extends State<CreatePassword> {
+class _ListCategoriesState extends State<ListCategories> {
   int selectedCategoryID = 0;
+  String selectedCategoryName = '';
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController contentController = TextEditingController();
-    final PasswordProvider passwordProvider = context.watch<PasswordProvider>();
+    final TextEditingController textController = TextEditingController();
 
     final List<Category> categories = [
-      Category(id: 1),
-      Category(id: 2),
-      Category(id: 3),
-      Category(id: 4),
-      Category(id: 5),
-      Category(id: 6),
+      Category(id: 1, categoryName: "Entreterimento"),
+      Category(id: 2, categoryName: "Entreterimento"),
+      Category(id: 3, categoryName: "Entreterimento"),
+      Category(id: 4, categoryName: "Entreterimento"),
+      Category(id: 5, categoryName: "Entreterimento"),
+      Category(id: 6, categoryName: "Entreterimento"),
     ];
 
     final teste = [];
@@ -36,6 +35,7 @@ class _CreatePasswordState extends State<CreatePassword> {
         onTap: () {
           setState(() {
             selectedCategoryID = cat.id!;
+            selectedCategoryName = cat.categoryName!;
           });
         },
         child: Container(
@@ -48,7 +48,7 @@ class _CreatePasswordState extends State<CreatePassword> {
                 : Border.all(color: Colors.blue),
             borderRadius: BorderRadius.all(Radius.circular(48)),
           ),
-          child: Text('Entreterimento',
+          child: Text(cat.categoryName!,
               style: cat.id == selectedCategoryID
                   ? TextStyle(
                       color: Colors.white,
@@ -64,10 +64,11 @@ class _CreatePasswordState extends State<CreatePassword> {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 100,
         title: Padding(
           padding: const EdgeInsets.only(top: 32),
           child: Text(
-            'Create password',
+            'Your Categories',
             style: TextStyle(
               fontSize: 32,
             ),
@@ -89,10 +90,10 @@ class _CreatePasswordState extends State<CreatePassword> {
         elevation: 0,
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: EdgeInsets.only(
-              top: 32,
               bottom: 32,
               left: 24,
               right: 24,
@@ -108,12 +109,12 @@ class _CreatePasswordState extends State<CreatePassword> {
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 2,
                   blurRadius: 4,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: Offset(0, 3),
                 ),
               ],
             ),
             child: Text(
-              'Here you can create passwords that will be protected on our database. Never forget a password again!',
+              'Here you can view, edit and delete your categories',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
@@ -122,40 +123,6 @@ class _CreatePasswordState extends State<CreatePassword> {
               ),
             ),
           ),
-          SizedBox(height: 48),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Form(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Name of the service relationed to the password'),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: contentController,
-                      decoration:
-                          getFormDecoration(context, true, 'Content name'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (chegada) => chegada == null || chegada.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
-                    SizedBox(height: 32),
-                    Text('Password that gives you the access'),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: passwordController,
-                      decoration: getFormDecoration(context, true, 'Password'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (chegada) => chegada == null || chegada.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
-                  ],
-                ),
-              )),
           SizedBox(height: 24),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -163,16 +130,35 @@ class _CreatePasswordState extends State<CreatePassword> {
               children: [SizedBox(width: 16), ...teste],
             ),
           ),
-          SizedBox(height: 32),
-          SizedBox(
-              width: MediaQuery.of(context).size.width - 32,
-              child: ElevatedButton(
-                  onPressed: () {
-                    passwordProvider.createPassword(Password(
-                        contentName: contentController.text,
-                        password: passwordController.text));
-                  },
-                  child: Text('Save Password'))),
+          SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Editing category: $selectedCategoryName'),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: textController,
+                  decoration: getFormDecoration(context, true, 'Category name'),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onSaved: (String? teste) {},
+                  validator: (chegada) => chegada == null || chegada.isEmpty
+                      ? "Can't be null"
+                      : null,
+                ),
+                SizedBox(height: 24),
+                SizedBox(
+                    width: MediaQuery.of(context).size.width - 32,
+                    child: ElevatedButton(
+                        onPressed: () {}, child: Text('Edit Category'))),
+                SizedBox(
+                    width: MediaQuery.of(context).size.width - 32,
+                    child: ElevatedButton(
+                        onPressed: () {}, child: Text('Delete Category'))),
+              ],
+            ),
+          )
         ],
       ),
     );

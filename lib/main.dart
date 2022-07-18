@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:passwords_client/providers/category_password.dart';
 import 'package:passwords_client/providers/password_provider.dart';
 import 'package:passwords_client/providers/user_provider.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Password Manager',
       theme: ThemeData(
