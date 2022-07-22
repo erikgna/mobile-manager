@@ -27,32 +27,12 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> saveUser(User userInput) async {
+  Future<bool> authenticate(
+      {required User userInput, required bool isLogin}) async {
     try {
-      final Token token = await _userWeb.register(userInput);
-
-      final decodedToken = JwtDecoder.decode(token.accessToken);
-
-      user = User(
-        id: decodedToken['id'],
-        userName: decodedToken['name'],
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
-      );
-
-      storage.write(key: 'user', value: jsonEncode(user!.toJson()));
-
-      notifyListeners();
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<bool> getUser({User? userInput}) async {
-    try {
-      final Token token = await _userWeb.login(userInput!);
+      final Token token = isLogin
+          ? await _userWeb.login(userInput)
+          : await _userWeb.register(userInput);
 
       final decodedToken = JwtDecoder.decode(token.accessToken);
 

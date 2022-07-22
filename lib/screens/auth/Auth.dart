@@ -17,10 +17,8 @@ class Auth extends StatefulWidget {
 }
 
 class _AuthState extends State<Auth> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passController = TextEditingController();
-  final TextEditingController confirmPassController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
+  final User editUser = User();
+  final _formKey = GlobalKey<FormState>();
   bool isLogin = false;
 
   @override
@@ -30,6 +28,27 @@ class _AuthState extends State<Auth> {
         context.watch<CategoryProvider>();
     final PasswordProvider passwordController =
         context.watch<PasswordProvider>();
+
+    void authenticate() async {
+      if (_formKey.currentState!.validate()) {
+        final bool success = await userController.authenticate(
+            userInput: editUser, isLogin: !isLogin);
+
+        if (success) {
+          categoryController.getCategories([]);
+          passwordController.getPasswords([]);
+          Get.to(const Home());
+        }
+      }
+    }
+
+    String? fieldsValidation(String? value) {
+      if (value == null || value == "") {
+        return "Value can't be empty";
+      }
+
+      return null;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -49,100 +68,61 @@ class _AuthState extends State<Auth> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 32),
-            isLogin
-                ? Column(children: [
+            Form(
+                key: _formKey,
+                child: Column(
+                  children: [
                     TextFormField(
-                      controller: emailController,
-                      decoration: getFormDecoration(context, true, 'Email'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
+                        decoration: getFormDecoration(context, true, 'Email'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        onChanged: (String? value) => editUser.email = value,
+                        validator: fieldsValidation),
+                    isLogin
+                        ? const SizedBox(height: 24)
+                        : const SizedBox.shrink(),
+                    isLogin
+                        ? TextFormField(
+                            decoration:
+                                getFormDecoration(context, true, 'Full Name'),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            onChanged: (String? value) =>
+                                editUser.userName = value,
+                            validator: fieldsValidation)
+                        : const SizedBox.shrink(),
                     const SizedBox(height: 24),
                     TextFormField(
-                      controller: nameController,
-                      decoration: getFormDecoration(context, true, 'Full Name'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Can't be null"
-                          : null,
+                        decoration:
+                            getFormDecoration(context, true, 'Password'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        onChanged: (String? value) => editUser.password = value,
+                        validator: fieldsValidation),
+                    isLogin
+                        ? const SizedBox(height: 24)
+                        : const SizedBox.shrink(),
+                    isLogin
+                        ? TextFormField(
+                            decoration: getFormDecoration(
+                                context, true, 'Confirm Password'),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            onChanged: (String? value) =>
+                                editUser.confirmPassword = value,
+                            validator: fieldsValidation)
+                        : const SizedBox.shrink(),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(40),
+                      ),
+                      onPressed: authenticate,
+                      child: Text(
+                        isLogin ? 'Register' : 'Login',
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: passController,
-                      decoration: getFormDecoration(context, true, 'Password'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: confirmPassController,
-                      decoration:
-                          getFormDecoration(context, true, 'Confirm Password'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    )
-                  ])
-                : Column(children: [
-                    TextFormField(
-                      controller: emailController,
-                      decoration: getFormDecoration(context, true, 'Email'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: passController,
-                      decoration: getFormDecoration(context, true, 'Password'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
-                  ]),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(40),
-              ),
-              onPressed: () async {
-                bool success = false;
-
-                final User user = User(
-                  email: emailController.text,
-                  userName: nameController.text,
-                  password: passController.text,
-                  confirmPassword: confirmPassController.text,
-                );
-
-                isLogin
-                    ? success = await userController.saveUser(user)
-                    : success = await userController.getUser(userInput: user);
-
-                if (success) {
-                  categoryController.getCategories([]);
-                  passwordController.getPasswords([]);
-                  Get.to(const Home());
-                }
-              },
-              child: Text(
-                isLogin ? 'Register' : 'Login',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
+                  ],
+                )),
             const SizedBox(height: 24),
             RichText(
                 textAlign: TextAlign.center,
@@ -163,11 +143,9 @@ class _AuthState extends State<Auth> {
                               fontSize: 16,
                             ),
                           ),
-                          onTap: () {
-                            setState(() {
-                              isLogin = isLogin ? false : true;
-                            });
-                          }))
+                          onTap: () => setState(() {
+                                isLogin = isLogin ? false : true;
+                              })))
                 ])),
           ]),
         ),

@@ -9,6 +9,14 @@ class CategoryProvider extends ChangeNotifier {
   final CategoryWebClient _categoryWeb = CategoryWebClient();
   final List<Category> categories = [];
 
+  CategoryProvider() {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await getCategories([]);
+  }
+
   Future<Category?> getCategory(int id) async {
     try {
       return await _categoryWeb.getCategory(id);

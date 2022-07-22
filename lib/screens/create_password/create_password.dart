@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:passwords_client/core/default_top_bar.dart';
+import 'package:passwords_client/core/category_widget.dart';
 import 'package:passwords_client/core/theme/form_field_theme.dart';
 import 'package:passwords_client/models/category.dart';
 import 'package:passwords_client/models/password.dart';
@@ -15,108 +17,49 @@ class CreatePassword extends StatefulWidget {
 
 class _CreatePasswordState extends State<CreatePassword> {
   int selectedCategoryID = 0;
+  final Password editPassword = Password();
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController contentController = TextEditingController();
     final PasswordProvider passwordProvider = context.watch<PasswordProvider>();
     final CategoryProvider categoryProvider = context.watch<CategoryProvider>();
 
-    final categories = [];
+    final List categories = [];
     for (Category category in categoryProvider.categories) {
-      categories.add(GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedCategoryID = category.id!;
-          });
-        },
-        child: Container(
-          margin: const EdgeInsets.only(right: 16),
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color:
-                category.id == selectedCategoryID ? Colors.blue : Colors.white,
-            border: category.id == selectedCategoryID
-                ? null
-                : Border.all(color: Colors.blue),
-            borderRadius: const BorderRadius.all(Radius.circular(48)),
-          ),
-          child: Text('Entreterimento',
-              style: category.id == selectedCategoryID
-                  ? const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    )
-                  : const TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w600,
-                    )),
-        ),
-      ));
+      categories.add(CategoryWidget(
+          changeFunction: () => setState(() {
+                selectedCategoryID = category.id!;
+                editPassword.categoryID = category.id!;
+              }),
+          category: category,
+          selectedCategoryID: selectedCategoryID,
+          selectedCategoryName: null));
+    }
+
+    void createPassword() async {
+      final String result = await passwordProvider.createPassword(editPassword);
+
+      final snackBar = SnackBar(content: Text(result));
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    String? passwordChecker(String? value) {
+      if (value == null || value == '') {
+        return "Can't be empty";
+      }
+      return null;
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.only(top: 32),
-          child: Text(
-            'Create password',
-            style: TextStyle(
-              fontSize: 32,
-            ),
-          ),
-        ),
-        centerTitle: false,
-        leadingWidth: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(top: 24, right: 8),
-            child: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                }),
-          )
-        ],
-        leading: const SizedBox.shrink(),
-        elevation: 0,
-      ),
+      appBar: defaultAppBar(title: 'Create Password'),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.only(
-                top: 32,
-                bottom: 32,
-                left: 24,
-                right: 24,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(8),
-                  bottomRight: Radius.circular(8),
-                ),
-                color: Colors.blue,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 4,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: const Text(
-                'Here you can create passwords that will be protected on our database. Never forget a password again!',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                  height: 1.25,
-                ),
-              ),
-            ),
+            defaultBigAppBar(
+                description:
+                    'Here you can create passwords that will be protected on our database. Never forget a password again!'),
             const SizedBox(height: 48),
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -128,30 +71,22 @@ class _CreatePasswordState extends State<CreatePassword> {
                           'Name of the service relationed to the password'),
                       const SizedBox(height: 16),
                       TextFormField(
-                        controller: contentController,
-                        decoration:
-                            getFormDecoration(context, true, 'Content name'),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        onSaved: (String? teste) {},
-                        validator: (chegada) =>
-                            chegada == null || chegada.isEmpty
-                                ? "Can't be null"
-                                : null,
-                      ),
+                          onChanged: (String? value) =>
+                              editPassword.contentName = value,
+                          decoration:
+                              getFormDecoration(context, true, 'Content name'),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: passwordChecker),
                       const SizedBox(height: 32),
                       const Text('Password that gives you the access'),
                       const SizedBox(height: 16),
                       TextFormField(
-                        controller: passwordController,
-                        decoration:
-                            getFormDecoration(context, true, 'Password'),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        onSaved: (String? teste) {},
-                        validator: (chegada) =>
-                            chegada == null || chegada.isEmpty
-                                ? "Can't be null"
-                                : null,
-                      ),
+                          onChanged: (String? value) =>
+                              editPassword.password = value,
+                          decoration:
+                              getFormDecoration(context, true, 'Password'),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: passwordChecker),
                     ],
                   ),
                 )),
@@ -159,25 +94,17 @@ class _CreatePasswordState extends State<CreatePassword> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [const SizedBox(width: 16), ...categories],
+                children: [
+                  const SizedBox(width: 16),
+                  ...categories,
+                ],
               ),
             ),
             const SizedBox(height: 32),
             SizedBox(
                 width: MediaQuery.of(context).size.width - 32,
                 child: ElevatedButton(
-                    onPressed: () async {
-                      final String result =
-                          await passwordProvider.createPassword(Password(
-                              categoryID: selectedCategoryID,
-                              contentName: contentController.text,
-                              password: passwordController.text));
-
-                      final snackBar = SnackBar(content: Text(result));
-
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    },
+                    onPressed: createPassword,
                     child: const Text('Save Password'))),
           ],
         ),

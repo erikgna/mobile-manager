@@ -1,12 +1,12 @@
 class User {
-  final int? id;
-  final String? email;
-  final String? userName;
-  final String? password;
-  final String? confirmPassword;
-  final String? accessToken;
-  final String? refreshToken;
-  final bool? isActive;
+  int? id;
+  String? email;
+  String? userName;
+  String? password;
+  String? confirmPassword;
+  String? accessToken;
+  String? refreshToken;
+  bool? isActive;
 
   User(
       {this.id,

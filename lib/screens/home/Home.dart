@@ -205,8 +205,12 @@ class _HomeState extends State<Home> {
                             height: 40,
                             width: MediaQuery.of(context).size.width - 32,
                             child: ElevatedButton(
-                                onPressed: () =>
-                                    {userController.logout(), Get.to(Auth())},
+                                onPressed: () {
+                                  try {
+                                    Get.to(Auth());
+                                    userController.logout();
+                                  } catch (_) {}
+                                },
                                 style: ButtonStyle(
                                     shape: MaterialStateProperty.all<
                                             RoundedRectangleBorder>(

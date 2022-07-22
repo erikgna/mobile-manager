@@ -9,6 +9,14 @@ class PasswordProvider extends ChangeNotifier {
   final PasswordWebClient _passwordWeb = PasswordWebClient();
   final List<Password> passwords = [];
 
+  PasswordProvider() {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await getPasswords([]);
+  }
+
   Future<Password?> getPassword(int id) async {
     try {
       return await _passwordWeb.getPassword(id);

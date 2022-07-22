@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:passwords_client/core/default_top_bar.dart';
 import 'package:passwords_client/core/theme/form_field_theme.dart';
 import 'package:passwords_client/models/category.dart';
 import 'package:passwords_client/providers/category_password.dart';
@@ -12,74 +14,29 @@ class CreateCategory extends StatefulWidget {
 }
 
 class _CreateCategoryState extends State<CreateCategory> {
-  int selectedCategoryID = 0;
-  final TextEditingController textController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    final Category editCategory = Category();
     final CategoryProvider categoryProvider = context.watch<CategoryProvider>();
 
+    void createCategory() async {
+      final String result = await categoryProvider.createCategory(editCategory);
+
+      final snackBar = SnackBar(content: Text(result));
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+      Get.back();
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
-        title: const Padding(
-          padding: EdgeInsets.only(top: 32),
-          child: Text(
-            'Create category',
-            style: TextStyle(
-              fontSize: 32,
-            ),
-          ),
-        ),
-        centerTitle: false,
-        leadingWidth: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                }),
-          )
-        ],
-        leading: const SizedBox.shrink(),
-        elevation: 0,
-      ),
+      appBar: defaultAppBar(title: 'Create Category'),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.only(
-              top: 8,
-              bottom: 32,
-              left: 24,
-              right: 24,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
-              ),
-              color: Colors.blue,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 4,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: const Text(
-              'Here you can create categories to your passwords, that will maintain it more organizade and easy to use.',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: Colors.white,
-                height: 1.25,
-              ),
-            ),
-          ),
+          defaultBigAppBar(
+              description:
+                  'Here you can create categories to your passwords, that will maintain it more organizade and easy to use.'),
           const SizedBox(height: 48),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -90,7 +47,8 @@ class _CreateCategoryState extends State<CreateCategory> {
                     const Text('Name of the category'),
                     const SizedBox(height: 16),
                     TextFormField(
-                        controller: textController,
+                        onChanged: (String? value) =>
+                            editCategory.categoryName = value,
                         decoration:
                             getFormDecoration(context, true, 'Category'),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -110,15 +68,7 @@ class _CreateCategoryState extends State<CreateCategory> {
           SizedBox(
               width: MediaQuery.of(context).size.width - 32,
               child: ElevatedButton(
-                  onPressed: () async {
-                    final String result = await categoryProvider.createCategory(
-                        Category(categoryName: textController.text));
-
-                    final snackBar = SnackBar(content: Text(result));
-
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
+                  onPressed: createCategory,
                   child: const Text('Save Category'))),
         ],
       ),
