@@ -15,7 +15,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.get(
-        Uri.parse('http://192.168.3.6:3000/api/v1/password/$id'),
+        Uri.parse('http://192.168.3.10:3000/api/v1/password/$id'),
         headers: {
           'Content-type': 'application/json',
           'Accept': '*/*',
@@ -35,7 +35,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client
-        .get(Uri.parse('http://192.168.3.6:3000/api/v1/password'), headers: {
+        .get(Uri.parse('http://192.168.3.10:3000/api/v1/password'), headers: {
       'Content-type': 'application/json',
       'Accept': '*/*',
       'refreshToken': user['refreshToken'],
@@ -60,7 +60,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response =
-        await client.post(Uri.parse('http://192.168.3.6:3000/api/v1/password'),
+        await client.post(Uri.parse('http://192.168.3.10:3000/api/v1/password'),
             headers: {
               'Content-type': 'application/json',
               'Accept': '*/*',
@@ -81,7 +81,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.put(
-        Uri.parse('http://192.168.3.6:3000/api/v1/password/${password.id}'),
+        Uri.parse('http://192.168.3.10:3000/api/v1/password/${password.id}'),
         headers: {
           'Content-type': 'application/json',
           'Accept': '*/*',
@@ -97,12 +97,12 @@ class PasswordWebClient {
     throw APIException(response.body);
   }
 
-  Future<bool> deletePassword(int id) async {
+  Future<void> deletePassword(int id) async {
     final String? userFromStorage = await storage.read(key: 'user');
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.delete(
-      Uri.parse('http://192.168.3.6:3000/api/v1/password/$id'),
+      Uri.parse('http://192.168.3.10:3000/api/v1/password/$id'),
       headers: {
         'Content-type': 'application/json',
         'Accept': '*/*',
@@ -112,7 +112,7 @@ class PasswordWebClient {
     );
 
     if (response.statusCode == 200) {
-      return true;
+      return;
     }
 
     throw APIException(response.body);

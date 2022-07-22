@@ -11,7 +11,7 @@ InputDecoration getFormDecoration(
     contentPadding: const EdgeInsets.fromLTRB(16, 18, 24, 14),
     enabled: enabled,
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: AppColors.mainColor, width: 1),
+      borderSide: const BorderSide(color: AppColors.mainColor, width: 1),
       borderRadius: BorderRadius.circular(8),
     ),
     enabledBorder: OutlineInputBorder(
@@ -23,11 +23,11 @@ InputDecoration getFormDecoration(
       borderRadius: BorderRadius.circular(8),
     ),
     errorBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: AppColors.errorColor, width: 2),
+      borderSide: const BorderSide(color: AppColors.errorColor, width: 2),
       borderRadius: BorderRadius.circular(8),
     ),
     focusedErrorBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: AppColors.errorColor, width: 2),
+      borderSide: const BorderSide(color: AppColors.errorColor, width: 2),
       borderRadius: BorderRadius.circular(8),
     ),
     labelText: label,

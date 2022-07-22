@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:passwords_client/api/category_web.dart';
+import 'package:passwords_client/api/config/api_error.dart';
 import 'package:passwords_client/models/category.dart';
 
 enum CategoryProviderState { success, loading, error }
@@ -36,40 +37,45 @@ class CategoryProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createCategory(Category category) async {
+  Future<String> createCategory(Category category) async {
     try {
-      final Category categoryCreated =
-          await _categoryWeb.createCategory(category);
+      final Category response = await _categoryWeb.createCategory(category);
 
-      categories.add(categoryCreated);
+      categories.add(response);
 
       notifyListeners();
 
-      return true;
-    } catch (e) {
-      return false;
+      return 'Category created successfuly!';
+    } on APIException catch (e) {
+      return e.cause;
     }
   }
 
-  Future<bool> updateCategory(Category category) async {
+  Future<String> updateCategory(Category category) async {
     try {
-      await _categoryWeb.editCategory(category);
-      return true;
-    } catch (e) {
-      return false;
+      final Category response = await _categoryWeb.editCategory(category);
+
+      categories.removeWhere((element) => element.id == category.id);
+      categories.add(response);
+
+      notifyListeners();
+
+      return 'Category updated successfuly!';
+    } on APIException catch (e) {
+      return e.cause;
     }
   }
 
-  Future<bool> deleteCategory(int id) async {
+  Future<String> deleteCategory(int id) async {
     try {
       await _categoryWeb.deleteCategory(id);
       categories.removeWhere((category) => category.id == id);
 
       notifyListeners();
 
-      return true;
-    } catch (e) {
-      return false;
+      return 'Category deleted successfuly!';
+    } on APIException catch (e) {
+      return e.cause;
     }
   }
 }

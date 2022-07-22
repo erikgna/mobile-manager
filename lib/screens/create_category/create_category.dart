@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passwords_client/core/theme/form_field_theme.dart';
 import 'package:passwords_client/models/category.dart';
-import 'package:passwords_client/models/password.dart';
 import 'package:passwords_client/providers/category_password.dart';
 import 'package:provider/provider.dart';
 
@@ -14,17 +13,17 @@ class CreateCategory extends StatefulWidget {
 
 class _CreateCategoryState extends State<CreateCategory> {
   int selectedCategoryID = 0;
+  final TextEditingController textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController textController = TextEditingController();
     final CategoryProvider categoryProvider = context.watch<CategoryProvider>();
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 32),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 32),
           child: Text(
             'Create category',
             style: TextStyle(
@@ -38,26 +37,26 @@ class _CreateCategoryState extends State<CreateCategory> {
           Padding(
             padding: const EdgeInsets.only(top: 24),
             child: IconButton(
-                icon: Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 onPressed: () {
                   Navigator.of(context).pop();
                 }),
           )
         ],
-        leading: SizedBox.shrink(),
+        leading: const SizedBox.shrink(),
         elevation: 0,
       ),
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               top: 8,
               bottom: 32,
               left: 24,
               right: 24,
             ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(8),
                 bottomRight: Radius.circular(8),
               ),
@@ -67,11 +66,11 @@ class _CreateCategoryState extends State<CreateCategory> {
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 2,
                   blurRadius: 4,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-            child: Text(
+            child: const Text(
               'Here you can create categories to your passwords, that will maintain it more organizade and easy to use.',
               style: TextStyle(
                 fontSize: 16,
@@ -81,36 +80,46 @@ class _CreateCategoryState extends State<CreateCategory> {
               ),
             ),
           ),
-          SizedBox(height: 48),
+          const SizedBox(height: 48),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Form(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name of the category'),
-                    SizedBox(height: 16),
+                    const Text('Name of the category'),
+                    const SizedBox(height: 16),
                     TextFormField(
-                      controller: textController,
-                      decoration: getFormDecoration(context, true, 'Category'),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onSaved: (String? teste) {},
-                      validator: (chegada) => chegada == null || chegada.isEmpty
-                          ? "Can't be null"
-                          : null,
-                    ),
+                        controller: textController,
+                        decoration:
+                            getFormDecoration(context, true, 'Category'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) {
+                          if (value == null || value == '') {
+                            return "Can't be empty";
+                          }
+                          if (value.length <= 3) {
+                            return "Must have at least 4 letters";
+                          }
+                          return null;
+                        }),
                   ],
                 ),
               )),
-          SizedBox(height: 32),
+          const SizedBox(height: 32),
           SizedBox(
               width: MediaQuery.of(context).size.width - 32,
               child: ElevatedButton(
-                  onPressed: () {
-                    categoryProvider.createCategory(
+                  onPressed: () async {
+                    final String result = await categoryProvider.createCategory(
                         Category(categoryName: textController.text));
+
+                    final snackBar = SnackBar(content: Text(result));
+
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
-                  child: Text('Save Category'))),
+                  child: const Text('Save Category'))),
         ],
       ),
     );

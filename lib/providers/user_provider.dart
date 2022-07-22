@@ -19,7 +19,11 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> _loadData() async {
-    await getUser();
+    final String? stringUser = await storage.read(key: 'user');
+    if (stringUser != null) {
+      user = User.fromJson(jsonDecode(stringUser));
+    }
+
     notifyListeners();
   }
 
@@ -69,7 +73,8 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  void logout() {
+  void logout() async {
+    storage.delete(key: 'user');
     user = null;
 
     notifyListeners();
