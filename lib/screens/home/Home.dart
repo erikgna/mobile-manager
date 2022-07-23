@@ -47,7 +47,7 @@ class Home extends StatelessWidget {
                         Column(
                           children: const [
                             Text(
-                              '08',
+                              '03',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -101,7 +101,7 @@ class Home extends StatelessWidget {
                                     builder: (context) => CreateCategory()),
                               );
                             },
-                            icon: Icon(Icons.lock_clock_outlined),
+                            icon: Icon(Icons.newspaper),
                             title: "New category",
                             description: "Create new categories",
                           ),
@@ -128,7 +128,7 @@ class Home extends StatelessWidget {
                                     builder: (context) => ListCategories()),
                               );
                             },
-                            icon: Icon(Icons.lock_clock_outlined),
+                            icon: Icon(Icons.list),
                             title: "List categories",
                             description: "See your categories",
                           ),
@@ -141,7 +141,7 @@ class Home extends StatelessWidget {
                                     builder: (context) => ListCategories()),
                               );
                             },
-                            icon: Icon(Icons.lock_clock_outlined),
+                            icon: Icon(Icons.security_rounded),
                             title: "List passwords",
                             description: "See your passwords",
                           ),
