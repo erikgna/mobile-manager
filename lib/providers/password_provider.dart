@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:passwords_client/api/config/api_error.dart';
 import 'package:passwords_client/api/password_web.dart';
 import '../models/password.dart';
 
@@ -7,6 +8,14 @@ enum PasswordProviderState { success, loading, error }
 class PasswordProvider extends ChangeNotifier {
   final PasswordWebClient _passwordWeb = PasswordWebClient();
   final List<Password> passwords = [];
+
+  PasswordProvider() {
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await getPasswords([]);
+  }
 
   Future<Password?> getPassword(int id) async {
     try {
@@ -37,7 +46,7 @@ class PasswordProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createPassword(Password password) async {
+  Future<String> createPassword(Password password) async {
     try {
       final Password passwordCreated =
           await _passwordWeb.createPassword(password);
@@ -46,43 +55,42 @@ class PasswordProvider extends ChangeNotifier {
 
       notifyListeners();
 
-      return true;
-    } catch (e) {
-      return false;
+      return "Password created successfuly!";
+    } on APIException catch (e) {
+      return e.cause;
     }
   }
 
-  Future<bool> updatePassword(Password password) async {
+  Future<String> updatePassword(Password password) async {
     try {
-      await _passwordWeb.editPassword(password);
-      return true;
-    } catch (e) {
-      return false;
+      final Password response = await _passwordWeb.editPassword(password);
+      passwords.removeWhere((element) => element.id == password.id);
+      passwords.add(response);
+
+      notifyListeners();
+
+      return "Password updated successfuly!";
+    } on APIException catch (e) {
+      return e.cause;
     }
   }
 
-  Future<bool> deletePassword(int id) async {
+  Future<String> deletePassword(int id) async {
     try {
       await _passwordWeb.deletePassword(id);
       passwords.removeWhere((password) => password.id == id);
 
       notifyListeners();
 
-      return true;
-    } catch (e) {
-      return false;
+      return 'Password deleted successfuly!';
+    } on APIException catch (e) {
+      return e.cause;
     }
   }
 
-  Future<bool> deletePasswordOfCategory(int categoryID) async {
-    try {
-      passwords.removeWhere((pass) => pass.categoryID == categoryID);
+  Future<void> deletePasswordOfCategory(int categoryID) async {
+    passwords.removeWhere((pass) => pass.categoryID == categoryID);
 
-      notifyListeners();
-
-      return true;
-    } catch (e) {
-      return false;
-    }
+    notifyListeners();
   }
 }

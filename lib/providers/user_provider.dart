@@ -19,13 +19,20 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> _loadData() async {
-    await getUser();
+    final String? stringUser = await storage.read(key: 'user');
+    if (stringUser != null) {
+      user = User.fromJson(jsonDecode(stringUser));
+    }
+
     notifyListeners();
   }
 
-  Future<bool> saveUser(User userInput) async {
+  Future<bool> authenticate(
+      {required User userInput, required bool isLogin}) async {
     try {
-      final Token token = await _userWeb.register(userInput);
+      final Token token = isLogin
+          ? await _userWeb.login(userInput)
+          : await _userWeb.register(userInput);
 
       final decodedToken = JwtDecoder.decode(token.accessToken);
 
@@ -46,30 +53,8 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> getUser({User? userInput}) async {
-    try {
-      final Token token = await _userWeb.login(userInput!);
-
-      final decodedToken = JwtDecoder.decode(token.accessToken);
-
-      user = User(
-        id: decodedToken['id'],
-        userName: decodedToken['name'],
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
-      );
-
-      storage.write(key: 'user', value: jsonEncode(user!.toJson()));
-
-      notifyListeners();
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  void logout() {
+  void logout() async {
+    storage.delete(key: 'user');
     user = null;
 
     notifyListeners();

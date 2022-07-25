@@ -2,27 +2,81 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:passwords_client/screens/create_category/CreateCategory.dart';
-import 'package:passwords_client/screens/create_password/CreatePassword.dart';
+import 'package:passwords_client/providers/category_password.dart';
+import 'package:passwords_client/providers/password_provider.dart';
+import 'package:passwords_client/screens/auth/auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/user_provider.dart';
-import '../list_categories/ListCategories.dart';
+import '../create_category/create_category.dart';
+import '../create_password/create_password.dart';
+import '../list_categories/list_categories.dart';
+import '../list_passwords/list_passwords.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String date = '';
+  @override
+  void initState() {
+    DateTime now = DateTime.now();
+    final List<String> weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+    final List<String> months = [
+      'jan',
+      'feb',
+      'mar',
+      'apr',
+      'may',
+      'jun',
+      'jul',
+      'aug',
+      'sep',
+      'oct',
+      'nov',
+      'dec'
+    ];
+
+    String numberDay = now.day.toString();
+    if (numberDay.length == 1) {
+      numberDay = '0${now.day}';
+    }
+    setState(() {
+      date =
+          '${weekdays[now.weekday - 1]}, $numberDay ${months[now.month - 1]} ${now.year}';
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final UserProvider userController = context.watch<UserProvider>();
+    final CategoryProvider categoryController =
+        context.watch<CategoryProvider>();
+    final PasswordProvider passwordController =
+        context.watch<PasswordProvider>();
 
     return Scaffold(
       body: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-              color: Colors.blue,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16)),
+              color: Theme.of(context).primaryColor,
             ),
             padding: EdgeInsets.only(top: 64),
             height: 264,
@@ -31,13 +85,15 @@ class Home extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Hello, Erik Gabriel Na',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
+                    userController.user == null
+                        ? SizedBox.shrink()
+                        : Text(
+                            'Hello, ${userController.user!.userName}',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
                     SizedBox(height: 8),
                     Text(
-                      'Monday, 17 jan 2022',
+                      date,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     SizedBox(height: 24),
@@ -45,9 +101,9 @@ class Home extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
-                          children: const [
+                          children: [
                             Text(
-                              '03',
+                              categoryController.categories.length.toString(),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -62,9 +118,9 @@ class Home extends StatelessWidget {
                           ],
                         ),
                         Column(
-                          children: const [
+                          children: [
                             Text(
-                              '08',
+                              passwordController.passwords.length.toString(),
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -72,7 +128,7 @@ class Home extends StatelessWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Categories\n registred',
+                              'Passwords\n registred',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 14),
                             ),
@@ -138,7 +194,7 @@ class Home extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ListCategories()),
+                                    builder: (context) => ListPasswords()),
                               );
                             },
                             icon: Icon(Icons.security_rounded),
@@ -149,21 +205,23 @@ class Home extends StatelessWidget {
                       ),
                       SizedBox(height: 64),
                       Center(
-                        child: Container(
+                        child: SizedBox(
                             height: 40,
                             width: MediaQuery.of(context).size.width - 32,
                             child: ElevatedButton(
-                                onPressed: () => userController.deleteUser(),
+                                onPressed: () {
+                                  try {
+                                    Get.to(Auth());
+                                    userController.logout();
+                                  } catch (_) {}
+                                },
                                 style: ButtonStyle(
                                     shape: MaterialStateProperty.all<
                                             RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ))),
-                                child: Text(
-                                    userController.user == null
-                                        ? 'Logar Usuário'
-                                        : 'Deslogar Usuário',
+                                child: Text('Deslogar Usuário',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600)))),
@@ -209,7 +267,7 @@ class AccessBox extends StatelessWidget {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 4,
-              offset: Offset(0, 3), // changes position of shadow
+              offset: Offset(0, 3),
             ),
           ],
         ),

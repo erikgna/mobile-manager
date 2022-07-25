@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:passwords_client/api/config/api_error.dart';
 import 'package:passwords_client/models/password.dart';
 
+import 'config/url_constant.dart';
 import 'config/webclient.dart';
 
 class PasswordWebClient {
@@ -14,14 +15,13 @@ class PasswordWebClient {
     final String? userFromStorage = await storage.read(key: 'user');
     final user = jsonDecode(userFromStorage!);
 
-    final Response response = await client.get(
-        Uri.parse('http://192.168.3.6:3000/api/v1/password/$id'),
-        headers: {
-          'Content-type': 'application/json',
-          'Accept': '*/*',
-          'refreshToken': user['refreshToken'],
-          'authorization': 'Bearer ${user['accessToken']}'
-        });
+    final Response response = await client
+        .get(Uri.parse('$computerUrl/api/v1/password/$id'), headers: {
+      'Content-type': 'application/json',
+      'Accept': '*/*',
+      'refreshToken': user['refreshToken'],
+      'authorization': 'Bearer ${user['accessToken']}'
+    });
 
     if (response.statusCode == 200) {
       return Password.fromJson(jsonDecode(response.body));
@@ -34,8 +34,8 @@ class PasswordWebClient {
     final String? userFromStorage = await storage.read(key: 'user');
     final user = jsonDecode(userFromStorage!);
 
-    final Response response = await client
-        .get(Uri.parse('http://192.168.3.6:3000/api/v1/password'), headers: {
+    final Response response =
+        await client.get(Uri.parse('$computerUrl/api/v1/password'), headers: {
       'Content-type': 'application/json',
       'Accept': '*/*',
       'refreshToken': user['refreshToken'],
@@ -60,7 +60,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response =
-        await client.post(Uri.parse('http://192.168.3.6:3000/api/v1/password'),
+        await client.post(Uri.parse('$computerUrl/api/v1/password'),
             headers: {
               'Content-type': 'application/json',
               'Accept': '*/*',
@@ -81,7 +81,7 @@ class PasswordWebClient {
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.put(
-        Uri.parse('http://192.168.3.6:3000/api/v1/password/${password.id}'),
+        Uri.parse('$computerUrl/api/v1/password/${password.id}'),
         headers: {
           'Content-type': 'application/json',
           'Accept': '*/*',
@@ -97,12 +97,12 @@ class PasswordWebClient {
     throw APIException(response.body);
   }
 
-  Future<bool> deletePassword(int id) async {
+  Future<void> deletePassword(int id) async {
     final String? userFromStorage = await storage.read(key: 'user');
     final user = jsonDecode(userFromStorage!);
 
     final Response response = await client.delete(
-      Uri.parse('http://192.168.3.6:3000/api/v1/password/$id'),
+      Uri.parse('$computerUrl/api/v1/password/$id'),
       headers: {
         'Content-type': 'application/json',
         'Accept': '*/*',
@@ -112,7 +112,7 @@ class PasswordWebClient {
     );
 
     if (response.statusCode == 200) {
-      return true;
+      return;
     }
 
     throw APIException(response.body);
